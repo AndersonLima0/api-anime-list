@@ -1,24 +1,73 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import "./Components/style.css";
+import { AnimeList } from "./Components/AnimeList";
+import { AnimeInfo } from "./Components/AnimeInfo";
+import { Navbar } from "./Components/Navbar";
+import { AddToList } from "./Components/AddToList";
+import { RemoveFromList } from "./Components/RemoveFromList";
 
 function App() {
+  const [search, setSearch] = useState("Shingeki no Kyojin");
+  const [animeData, setAnimeData] = useState();
+  const [animeInfo, setAnimeInfo] = useState();
+  const [myAnimeList, setMyAnimeList] = useState([]);
+
+  const addTo = (animeToAdd) => {
+    const newArray = [...myAnimeList, animeToAdd];
+    setMyAnimeList(newArray);
+  };
+
+  const removeFromList = (animeToRemove) => {
+    const newArray = myAnimeList.filter((anime) => {
+      return anime.mal_id !== animeToRemove.mal_id;
+    });
+    setMyAnimeList(newArray);
+  };
+
+  const getData = async () => {
+    const res = await fetch(
+      `https://api.jikan.moe/v4/anime?q=${search}&limit=20`
+    );
+    const resData = await res.json();
+    setAnimeData(resData.data);
+  };
+  useEffect(() => {
+    getData();
+  }, [search]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Navbar handleSubmit={setSearch} />
+      <div className="container">
+        <div className="animeInfo">
+          {animeInfo && <AnimeInfo animeInfo={animeInfo} />}
+        </div>
+        <div className="anime-row">
+          <h2 className="text-heading">Anime</h2>
+          <div className="row">
+            <AnimeList
+              animelist={animeData}
+              setAnimeInfo={setAnimeInfo}
+              animeComponent={AddToList}
+              handleList={(anime) => {
+                addTo(anime);
+              }}
+            />
+          </div>
+          <h2 className="text-heading">My List</h2>
+          <div className="row">
+            <AnimeList
+              animelist={myAnimeList}
+              setAnimeInfo={setAnimeInfo}
+              animeComponent={RemoveFromList}
+              handleList={(anime) => {
+                removeFromList(anime);
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
 
