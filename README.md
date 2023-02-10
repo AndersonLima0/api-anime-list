@@ -3,7 +3,7 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 <div>
-<img src="src/assets/img1.jpg" width= "300px"/>
+<img src="src/assets/img1.jpg" />
 </div>
 
 ## Available Scripts
